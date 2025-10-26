@@ -50,7 +50,7 @@
 
     h1 {
         font-size: 60px;
-        margin-top: 50px;
+        margin-top: 20px;
         text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
     }
 
@@ -60,6 +60,11 @@
         letter-spacing: 15px;
         margin: 50px 0;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        white-space: nowrap;
+        overflow: visible;
+        display: inline-block;
+        max-width: 90vw;
+        text-align: center;
     }
 
     #guessInput {
@@ -141,18 +146,25 @@
         font-weight: bold;
         padding: 15px 30px;
         border-radius: 10px;
-        margin: 20px auto;
         max-width: 600px;
         min-height: 50px;
-        display: none;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
         border: 3px solid #ffcd00;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-out, visibility 0.3s ease-out, transform 0.3s ease-out;
     }
 
     #messageArea.show {
-        display: block;
-        animation: slideIn 0.3s ease-out;
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
     }
 
     #messageArea.error {
@@ -170,11 +182,11 @@
     @keyframes slideIn {
         from {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateX(-50%) translateY(20px);
         }
         to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
         }
     }
 </style>
@@ -326,6 +338,30 @@ function newGame() {
 
 function updateDisplay() {
     phraseEl.textContent = guessed.join(' ');
+    
+    // Dynamically adjust font size based on word length to ensure single line display
+    const wordLength = secretPhrase.length;
+    let fontSize, letterSpacing;
+    
+    if (wordLength <= 8) {
+        fontSize = '80px';
+        letterSpacing = '15px';
+    } else if (wordLength <= 10) {
+        fontSize = '70px';
+        letterSpacing = '12px';
+    } else if (wordLength <= 12) {
+        fontSize = '60px';
+        letterSpacing = '10px';
+    } else if (wordLength <= 14) {
+        fontSize = '50px';
+        letterSpacing = '8px';
+    } else {
+        fontSize = '40px';
+        letterSpacing = '6px';
+    }
+    
+    phraseEl.style.fontSize = fontSize;
+    phraseEl.style.letterSpacing = letterSpacing;
     
     let guessedText = '';
     if (guessedLetters.size > 0) {
