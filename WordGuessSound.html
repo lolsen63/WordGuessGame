@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>🎡 ATE Word Guess</title>
+<title>⚙️ ATE Word Guess</title>
 <style>
     body {
         background-color: #004526;
@@ -19,18 +19,24 @@
     }
 
     .container {
-        position: relative;
         width: 100%;
         height: 100vh;
-        display: flex;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 40px;
+        padding: 40px;
+        box-sizing: border-box;
         align-items: center;
     }
 
+    .left-column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
     .falcon-image {
-        position: absolute;
-        left: 40px;
-        top: 40px;
         z-index: 1;
     }
 
@@ -41,11 +47,32 @@
         filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.8));
     }
 
-    .game-content {
+    .center-column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .main-game {
         text-align: center;
-        max-width: 800px;
-        z-index: 2;
-        position: relative;
+        width: 100%;
+        max-width: 700px;
+    }
+
+    .right-column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .right-controls {
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
     }
 
     h1 {
@@ -115,28 +142,85 @@
     #guessedLetters, #attempts {
         background-color: #ffcd00;
         color: black;
-        display: inline-block;
-        padding: 10px 20px;
+        display: block;
+        padding: 15px 20px;
         border-radius: 8px;
-        font-size: 28px;
-        margin-top: 30px;
+        font-size: 20px;
+        width: 100%;
+        box-sizing: border-box;
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        word-wrap: break-word;
     }
 
     #playAgain {
         font-size: 22px;
+        width: 100%;
     }
 
     #soundToggle {
         font-size: 18px;
-        padding: 6px 12px;
-        margin-left: 12px;
-        vertical-align: middle;
+        padding: 10px 12px;
+        width: 100%;
     }
 
-    #controls {
-        margin-top: 16px;
+
+
+    #letterKeyboard {
+        margin: 20px 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .letter-btn {
+        background-color: #ffcd00;
+        color: black;
+        font-size: 20px;
+        font-weight: bold;
+        font-family: Helvetica, sans-serif;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 12px;
+        cursor: pointer;
+        min-width: 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        transition: all 0.1s ease;
+    }
+
+    .letter-btn:hover {
+        background-color: #ffe066;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .letter-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .letter-btn:disabled {
+        background-color: #666;
+        color: #999;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .letter-btn.correct {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .letter-btn.incorrect {
+        background-color: #f44336;
+        color: white;
     }
 
     #messageArea {
@@ -194,30 +278,37 @@
 <body>
 
 <div class="container">
-    <div class="falcon-image">
-        <img src="images/falcon.png" alt="Falcon" />
+    <div class="left-column">
+        <div class="falcon-image">
+            <img src="images/falcon.png" alt="Falcon" />
+        </div>
     </div>
     
-    <div class="game-content">
-        <h1>⚙️ ATE Word Guess</h1>
-        
-        <div id="phrase">_ _ _ _ _</div>
+    <div class="center-column">
+        <div class="main-game">
+            <h1>⚙️ ATE Word Guess</h1>
+            
+            <div id="phrase">_ _ _ _ _</div>
 
-<input type="text" id="guessInput" placeholder="_" />
-<br>
-<button id="guessButton">Guess</button>
+            <input type="text" id="guessInput" placeholder="_" />
+            <br>
+            <button id="guessButton">Guess</button>
 
-<div id="messageArea"></div>
+            <div id="letterKeyboard"></div>
+        </div>
+    </div>
 
-<div id="controls">
-    <div id="guessedLetters">Guessed letters: </div>
-    <div id="attempts">Remaining attempts: 6</div>
-    <button id="playAgain" disabled>Play Again</button>
-    <button id="soundToggle" aria-pressed="false">🔊 Sound: On</button>
-</div>
-
+    <div class="right-column">
+        <div class="right-controls">
+            <div id="guessedLetters">Guessed letters: </div>
+            <div id="attempts">Remaining attempts: 6</div>
+            <button id="playAgain" disabled>Play Again</button>
+            <button id="soundToggle" aria-pressed="false">🔊 Sound: On</button>
+        </div>
     </div>
 </div>
+
+<div id="messageArea"></div>
 
 <script>
 /*
@@ -257,6 +348,7 @@ const attemptsEl = document.getElementById('attempts');
 const playAgainBtn = document.getElementById('playAgain');
 const soundToggleBtn = document.getElementById('soundToggle');
 const messageArea = document.getElementById('messageArea');
+const letterKeyboard = document.getElementById('letterKeyboard');
 
 // Create Audio objects. Adjust file paths as needed. Use .mp3/.ogg in your sounds folder.
 const sounds = {
@@ -322,12 +414,73 @@ function hideMessage() {
     }
 }
 
+// Create letter keyboard
+function createLetterKeyboard() {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    letterKeyboard.innerHTML = '';
+    
+    for (let letter of letters) {
+        const btn = document.createElement('button');
+        btn.textContent = letter;
+        btn.className = 'letter-btn';
+        btn.dataset.letter = letter;
+        
+        btn.addEventListener('click', () => {
+            if (!btn.disabled) {
+                guessLetter(letter);
+            }
+        });
+        
+        letterKeyboard.appendChild(btn);
+    }
+}
+
+// Function to guess a letter (used by both keyboard and text input)
+function guessLetter(letter) {
+    playSound('click');
+    
+    if (guessedLetters.has(letter)) {
+        playSound('invalid');
+        showMessage("You've already guessed that letter.", 'error');
+        return;
+    }
+
+    guessedLetters.add(letter);
+
+    // Update button appearance
+    const btn = letterKeyboard.querySelector(`[data-letter="${letter}"]`);
+    
+    if (secretPhrase.includes(letter)) {
+        playSound('correct');
+        btn.classList.add('correct');
+        btn.disabled = true;
+        
+        // Reveal all instances of the letter
+        for (let i = 0; i < secretPhrase.length; i++) {
+            if (secretPhrase[i] === letter) {
+                guessed[i] = letter;
+            }
+        }
+        showMessage(`Good guess! '${letter}' is in the word.`, 'normal', 2000);
+    } else {
+        attempts--;
+        playSound('incorrect');
+        btn.classList.add('incorrect');
+        btn.disabled = true;
+        showMessage(`Sorry, '${letter}' is not in the word.`, 'error', 2000);
+    }
+
+    updateDisplay();
+    checkGameOver();
+}
+
 function newGame() {
     secretPhrase = phrases[Math.floor(Math.random() * phrases.length)];
     guessed = Array.from(secretPhrase).map(ch => ch.match(/[A-Z]/) ? '_' : ch);
     guessedLetters.clear();
     guessedWords.clear();
     attempts = 6;
+    createLetterKeyboard();
     updateDisplay();
     guessInput.disabled = false;
     guessButton.disabled = false;
@@ -391,29 +544,9 @@ function makeGuess() {
 
     // Check if it's a single letter or a word
     if (guess.length === 1) {
-        // Single letter guess
-        if (guessedLetters.has(guess)) {
-            playSound('invalid');
-            showMessage("You've already guessed that letter.", 'error');
-            return;
-        }
-
-        guessedLetters.add(guess);
-
-        if (secretPhrase.includes(guess)) {
-            playSound('correct');
-            // Reveal all instances of the letter
-            for (let i = 0; i < secretPhrase.length; i++) {
-                if (secretPhrase[i] === guess) {
-                    guessed[i] = guess;
-                }
-            }
-            showMessage(`Good guess! '${guess}' is in the word.`, 'normal', 2000);
-        } else {
-            attempts--;
-            playSound('incorrect');
-            showMessage(`Sorry, '${guess}' is not in the word.`, 'error', 2000);
-        }
+        // Use the guessLetter function for single letters
+        guessLetter(guess);
+        return;
     } else {
         // Word guess
         if (guessedWords.has(guess)) {
@@ -460,6 +593,10 @@ function endGame(win) {
     guessInput.disabled = true;
     guessButton.disabled = true;
     playAgainBtn.disabled = false;
+    
+    // Disable all letter buttons
+    const letterButtons = letterKeyboard.querySelectorAll('.letter-btn');
+    letterButtons.forEach(btn => btn.disabled = true);
 
     if (win) {
         // play win sound then show message
