@@ -311,19 +311,6 @@
 <div id="messageArea"></div>
 
 <script>
-/*
-  Sound-enhanced version of the ATE Word Guess game.
-  - Add audio files into a "sounds/" directory next to this HTML file.
-  - Recommended filenames:
-      sounds/correct.mp3
-      sounds/incorrect.mp3
-      sounds/win.mp3
-      sounds/lose.mp3
-      sounds/click.mp3
-      sounds/invalid.mp3
-  - For broader browser support, include .ogg equivalents if you like and adjust paths.
-  - The script clones audio nodes before playing so multiple overlapping plays are allowed.
-*/
 
 const phrases = [
     'ALGORITHM','MODULE','CALIPER','MATRIX','KINETIC','FORMULA','GRAVITY','BALANCE',
@@ -353,10 +340,9 @@ const letterKeyboard = document.getElementById('letterKeyboard');
 // Create Audio objects. Adjust file paths as needed. Use .mp3/.ogg in your sounds folder.
 const sounds = {
     correct: createAudio('sounds/correctletter.mp3', 0.9),
-    incorrect: createAudio('sounds/incorrect.mp3', 0.9),
+    incorrect: createAudio('sounds/wrong.mp3', 0.9),
     win: createAudio('sounds/cheer.mp3', 1.0),
     lose: createAudio('sounds/lose.mp3', 1.0),
-    click: createAudio('sounds/click.mp3', 0.7),
     invalid: createAudio('sounds/invalid.mp3', 0.7)
 };
 
@@ -437,8 +423,6 @@ function createLetterKeyboard() {
 
 // Function to guess a letter (used by both keyboard and text input)
 function guessLetter(letter) {
-    playSound('click');
-    
     if (guessedLetters.has(letter)) {
         playSound('invalid');
         showMessage("You've already guessed that letter.", 'error');
@@ -531,7 +515,6 @@ function updateDisplay() {
 }
 
 function makeGuess() {
-    playSound('click'); // feedback for starting a guess
     const guess = guessInput.value.trim().toUpperCase();
     guessInput.value = '';
 
@@ -618,7 +601,6 @@ guessInput.addEventListener('keyup', e => {
     if (e.key === 'Enter') makeGuess();
 });
 playAgainBtn.addEventListener('click', () => {
-    playSound('click');
     newGame();
 });
 
@@ -626,8 +608,6 @@ soundToggleBtn.addEventListener('click', () => {
     soundEnabled = !soundEnabled;
     soundToggleBtn.textContent = soundEnabled ? '🔊 Sound: On' : '🔈 Sound: Off';
     soundToggleBtn.setAttribute('aria-pressed', String(!soundEnabled));
-    // Play a short click when enabling so user knows
-    if (soundEnabled) playSound('click');
 });
 
 // Start first game
