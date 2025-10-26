@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎡 ATE Word Guess</title>
+<style>
+    body {
+        background-color: #004526;
+        color: #ffcd00;
+        font-family: "Arial Narrow", sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-size: 60px;
+        margin-top: 50px;
+    }
+
+    #phrase {
+        font-size: 80px;
+        font-weight: bold;
+        letter-spacing: 15px;
+        margin: 50px 0;
+    }
+
+    #guessInput {
+        font-size: 56px;
+        font-weight: bold;
+        text-align: center;
+        background-color: #ffcd00;
+        color: black;
+        width: 100px;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        padding: 5px;
+    }
+
+    button {
+        background-color: #ffcd00;
+        color: black;
+        font-size: 34px;
+        font-family: Helvetica, sans-serif;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    #guessedLetters, #attempts {
+        background-color: #ffcd00;
+        color: black;
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 28px;
+        margin-top: 30px;
+    }
+
+    #playAgain {
+        font-size: 22px;
+    }
+</style>
+</head>
+<body>
+
+<h1>🎡 ATE Word Guess</h1>
+
+<div id="phrase">_ _ _ _ _</div>
+
+<input type="text" id="guessInput" maxlength="1" placeholder="A">
+<br>
+<button id="guessButton">Guess</button>
+
+<div>
+    <div id="guessedLetters">Guessed letters: </div>
+</div>
+
+<div>
+    <div id="attempts">Remaining attempts: 6</div>
+</div>
+
+<br>
+<button id="playAgain" disabled>Play Again</button>
+
+<script>
+const phrases = [
+    'ALGORITHM','MODULE','CALIPER','MATRIX','KINETIC','FORMULA','GRAVITY','BALANCE',
+    'NUCLEAR','SOFTWARE','ROTATION','CONTRAST','EXTRUSION','PARAMETER','HISTOGRAM',
+    'RENDERING','DIMENSION','COMPONENT','TRUNCATED','PROTOTYPE','TOLERANCE','ITERATION',
+    'COMPOSITE','STRUCTURAL','REVOLUTION','ENCRYPTION','INNOVATION','SIMULATION',
+    'COUNTERSINK','ABSTRACTION','SUSTAINABLE','PERSPECTIVE','CIRCUMSCRIBE','ASYMMETRICAL'
+];
+
+let secretPhrase = '';
+let guessed = [];
+let guessedLetters = new Set();
+let attempts = 6;
+
+const phraseEl = document.getElementById('phrase');
+const guessInput = document.getElementById('guessInput');
+const guessButton = document.getElementById('guessButton');
+const guessedLettersEl = document.getElementById('guessedLetters');
+const attemptsEl = document.getElementById('attempts');
+const playAgainBtn = document.getElementById('playAgain');
+
+function newGame() {
+    secretPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+    guessed = Array.from(secretPhrase).map(ch => ch.match(/[A-Z]/) ? '_' : ch);
+    guessedLetters.clear();
+    attempts = 6;
+    updateDisplay();
+    guessInput.disabled = false;
+    guessButton.disabled = false;
+    playAgainBtn.disabled = true;
+}
+
+function updateDisplay() {
+    phraseEl.textContent = guessed.join(' ');
+    guessedLettersEl.textContent = `Guessed letters: ${[...guessedLetters].sort().join(', ')}`;
+    attemptsEl.textContent = `Remaining attempts: ${attempts}`;
+}
+
+function makeGuess() {
+    const guess = guessInput.value.trim().toUpperCase();
+    guessInput.value = '';
+
+    if (!/^[A-Z]$/.test(guess)) {
+        alert('Please enter a single letter.');
+        return;
+    }
+
+    if (guessedLetters.has(guess)) {
+        alert("You've already guessed that letter.");
+        return;
+    }
+
+    guessedLetters.add(guess);
+
+    if (secretPhrase.includes(guess)) {
+        for (let i = 0; i < secretPhrase.length; i++) {
+            if (secretPhrase[i] === guess) {
+                guessed[i] = guess;
+            }
+        }
+    } else {
+        attempts--;
+    }
+
+    updateDisplay();
+    checkGameOver();
+}
+
+function checkGameOver() {
+    if (!guessed.includes('_')) {
+        endGame(true);
+    } else if (attempts <= 0) {
+        endGame(false);
+    }
+}
+
+function endGame(win) {
+    if (win) {
+        alert(`🎉 You Won!\nYou guessed the phrase: '${secretPhrase}'`);
+    } else {
+        alert(`😢 Game Over\nThe phrase was: '${secretPhrase}'`);
+    }
+    guessInput.disabled = true;
+    guessButton.disabled = true;
+    playAgainBtn.disabled = false;
+}
+
+// Event listeners
+guessButton.addEventListener('click', makeGuess);
+guessInput.addEventListener('keyup', e => {
+    if (e.key === 'Enter') makeGuess();
+});
+playAgainBtn.addEventListener('click', newGame);
+
+// Start first game
+newGame();
+</script>
+
+</body>
+</html>
