@@ -139,7 +139,7 @@
         cursor: not-allowed;
     }
 
-    #guessedLetters, #attempts {
+    #attempts {
         background-color: #ffcd00;
         color: black;
         display: block;
@@ -300,7 +300,6 @@
 
     <div class="right-column">
         <div class="right-controls">
-            <div id="guessedLetters">Guessed letters: </div>
             <div id="attempts">Remaining attempts: 6</div>
             <button id="playAgain" disabled>Play Again</button>
             <button id="soundToggle" aria-pressed="false">🔊 Sound: On</button>
@@ -330,7 +329,6 @@ let soundEnabled = true;
 const phraseEl = document.getElementById('phrase');
 const guessInput = document.getElementById('guessInput');
 const guessButton = document.getElementById('guessButton');
-const guessedLettersEl = document.getElementById('guessedLetters');
 const attemptsEl = document.getElementById('attempts');
 const playAgainBtn = document.getElementById('playAgain');
 const soundToggleBtn = document.getElementById('soundToggle');
@@ -500,17 +498,6 @@ function updateDisplay() {
     phraseEl.style.fontSize = fontSize;
     phraseEl.style.letterSpacing = letterSpacing;
     
-    let guessedText = '';
-    if (guessedLetters.size > 0) {
-        guessedText += `Letters: ${[...guessedLetters].sort().join(', ')}`;
-    }
-    if (guessedWords.size > 0) {
-        if (guessedText) guessedText += ' | ';
-        guessedText += `Words: ${[...guessedWords].sort().join(', ')}`;
-    }
-    if (!guessedText) guessedText = 'None yet';
-    
-    guessedLettersEl.textContent = `Guessed: ${guessedText}`;
     attemptsEl.textContent = `Remaining attempts: ${attempts}`;
 }
 
