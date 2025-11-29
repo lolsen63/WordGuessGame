@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>⚙️ ATE Word Guess</title>
+<style>
+    body {
+        background-color: #004526;
+        color: #ffcd00;
+        font-family: "Arial Narrow", sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        width: 100%;
+        height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 40px;
+        padding: 40px;
+        box-sizing: border-box;
+        align-items: center;
+    }
+
+    .left-column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .falcon-image {
+        z-index: 1;
+    }
+
+    .falcon-image img {
+        max-width: 250px;
+        height: auto;
+        border-radius: 10px;
+        filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.8));
+    }
+
+    .center-column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .main-game {
+        text-align: center;
+        width: 100%;
+        max-width: 700px;
+    }
+
+    .right-column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .right-controls {
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    h1 {
+        font-size: 60px;
+        margin-top: 20px;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    #phrase {
+        font-size: 80px;
+        font-weight: bold;
+        letter-spacing: 15px;
+        margin: 50px 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        white-space: nowrap;
+        overflow: visible;
+        display: inline-block;
+        max-width: 90vw;
+        text-align: center;
+    }
+
+    #guessInput {
+        font-size: 56px;
+        font-weight: bold;
+        text-align: center;
+        background-color: #ffcd00;
+        color: black;
+        width: 400px;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        padding: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    button {
+        background-color: #ffcd00;
+        color: black;
+        font-size: 34px;
+        font-family: Helvetica, sans-serif;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 20px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    button:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    #attempts {
+        background-color: #ffcd00;
+        color: black;
+        display: block;
+        padding: 15px 20px;
+        border-radius: 8px;
+        font-size: 20px;
+        width: 100%;
+        box-sizing: border-box;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        word-wrap: break-word;
+    }
+
+    #playAgain {
+        font-size: 22px;
+        width: 100%;
+    }
+
+    #soundToggle {
+        font-size: 18px;
+        padding: 10px 12px;
+        width: 100%;
+    }
+
+
+
+    #letterKeyboard {
+        margin: 20px 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .letter-btn {
+        background-color: #ffcd00;
+        color: black;
+        font-size: 20px;
+        font-weight: bold;
+        font-family: Helvetica, sans-serif;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 12px;
+        cursor: pointer;
+        min-width: 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        transition: all 0.1s ease;
+    }
+
+    .letter-btn:hover {
+        background-color: #ffe066;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .letter-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .letter-btn:disabled {
+        background-color: #666;
+        color: #999;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .letter-btn.correct {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .letter-btn.incorrect {
+        background-color: #f44336;
+        color: white;
+    }
+
+    #messageArea {
+        background-color: #ffcd00;
+        color: black;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 15px 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        min-height: 50px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+        border: 3px solid #ffcd00;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-out, visibility 0.3s ease-out, transform 0.3s ease-out;
+    }
+
+    #messageArea.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    #messageArea.error {
+        background-color: #ff4444;
+        color: white;
+        border-color: #cc0000;
+    }
+
+    #messageArea.success {
+        background-color: #00aa00;
+        color: white;
+        border-color: #008800;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="left-column">
+        <div class="falcon-image">
+            <img src="images/falcon.png" alt="Falcon" />
+        </div>
+    </div>
+    
+    <div class="center-column">
+        <div class="main-game">
+            <h1>⚙️ ATE Word Guess</h1>
+            
+            <div id="phrase">_ _ _ _ _</div>
+
+            <input type="text" id="guessInput" placeholder="_" />
+            <br>
+            <button id="guessButton">Guess</button>
+
+            <div id="letterKeyboard"></div>
+        </div>
+    </div>
+
+    <div class="right-column">
+        <div class="right-controls">
+            <div id="attempts">Remaining attempts: 6</div>
+            <button id="playAgain" disabled>Play Again</button>
+            <button id="soundToggle" aria-pressed="false">🔊 Sound: On</button>
+        </div>
+    </div>
+</div>
+
+<div id="messageArea"></div>
+
+<script>
+
+const phrases = [
+    'ALGORITHM','MODULE','CALIPER','MATRIX','KINETIC','FORMULA','GRAVITY','BALANCE',
+    'NUCLEAR','SOFTWARE','ROTATION','CONTRAST','EXTRUSION','PARAMETER','HISTOGRAM',
+    'RENDERING','DIMENSION','COMPONENT','TRUNCATED','PROTOTYPE','TOLERANCE','ITERATION',
+    'COMPOSITE','STRUCTURAL','REVOLUTION','ENCRYPTION','INNOVATION','SIMULATION',
+    'COUNTERSINK','ABSTRACTION','SUSTAINABLE','PERSPECTIVE','CIRCUMSCRIBE','ASYMMETRICAL'
+];
+
+let secretPhrase = '';
+let guessed = [];
+let guessedLetters = new Set();
+let guessedWords = new Set();
+let attempts = 6;
+let soundEnabled = true;
+
+const phraseEl = document.getElementById('phrase');
+const guessInput = document.getElementById('guessInput');
+const guessButton = document.getElementById('guessButton');
+const attemptsEl = document.getElementById('attempts');
+const playAgainBtn = document.getElementById('playAgain');
+const soundToggleBtn = document.getElementById('soundToggle');
+const messageArea = document.getElementById('messageArea');
+const letterKeyboard = document.getElementById('letterKeyboard');
+
+// Create Audio objects. Adjust file paths as needed. Use .mp3/.ogg in your sounds folder.
+const sounds = {
+    correct: createAudio('sounds/correctletter.mp3', 0.9),
+    incorrect: createAudio('sounds/wrong.mp3', 0.9),
+    win: createAudio('sounds/cheer.mp3', 1.0),
+    lose: createAudio('sounds/lose.mp3', 1.0),
+    invalid: createAudio('sounds/invalid.mp3', 0.7)
+};
+
+function createAudio(src, volume = 1) {
+    const a = new Audio(src);
+    a.preload = 'auto';
+    a.volume = volume;
+    return a;
+}
+
+// Play a cloned node so multiple sounds can overlap.
+function playSound(name) {
+    if (!soundEnabled) return;
+    const original = sounds[name];
+    if (!original) return;
+    try {
+        const clone = original.cloneNode(true);
+        // attempt to play; ignore promise rejection (browser may block before user gesture)
+        clone.play().catch(() => {});
+    } catch (e) {
+        // fallback: try playing original (some browsers don't like cloneNode)
+        try { original.play().catch(() => {}); } catch (_) {}
+    }
+}
+
+// Show message in the page instead of alert
+function showMessage(text, type = 'normal', duration = 3000) {
+    messageArea.textContent = text;
+    messageArea.className = 'show';
+    
+    if (type === 'error') {
+        messageArea.classList.add('error');
+    } else if (type === 'success') {
+        messageArea.classList.add('success');
+    }
+    
+    // Clear any existing timeout
+    if (messageArea.timeout) {
+        clearTimeout(messageArea.timeout);
+    }
+    
+    // Auto-hide after duration (except for game end messages)
+    if (type !== 'success' && type !== 'gameover') {
+        messageArea.timeout = setTimeout(() => {
+            messageArea.classList.remove('show');
+        }, duration);
+    }
+}
+
+// Hide message
+function hideMessage() {
+    messageArea.classList.remove('show');
+    if (messageArea.timeout) {
+        clearTimeout(messageArea.timeout);
+    }
+}
+
+// Create letter keyboard
+function createLetterKeyboard() {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    letterKeyboard.innerHTML = '';
+    
+    for (let letter of letters) {
+        const btn = document.createElement('button');
+        btn.textContent = letter;
+        btn.className = 'letter-btn';
+        btn.dataset.letter = letter;
+        
+        btn.addEventListener('click', () => {
+            if (!btn.disabled) {
+                guessLetter(letter);
+            }
+        });
+        
+        letterKeyboard.appendChild(btn);
+    }
+}
+
+// Function to guess a letter (used by both keyboard and text input)
+function guessLetter(letter) {
+    if (guessedLetters.has(letter)) {
+        playSound('invalid');
+        showMessage("You've already guessed that letter.", 'error');
+        return;
+    }
+
+    guessedLetters.add(letter);
+
+    // Update button appearance
+    const btn = letterKeyboard.querySelector(`[data-letter="${letter}"]`);
+    
+    if (secretPhrase.includes(letter)) {
+        playSound('correct');
+        btn.classList.add('correct');
+        btn.disabled = true;
+        
+        // Reveal all instances of the letter
+        for (let i = 0; i < secretPhrase.length; i++) {
+            if (secretPhrase[i] === letter) {
+                guessed[i] = letter;
+            }
+        }
+        showMessage(`Good guess! '${letter}' is in the word.`, 'normal', 2000);
+    } else {
+        attempts--;
+        playSound('incorrect');
+        btn.classList.add('incorrect');
+        btn.disabled = true;
+        showMessage(`Sorry, '${letter}' is not in the word.`, 'error', 2000);
+    }
+
+    updateDisplay();
+    checkGameOver();
+}
+
+function newGame() {
+    secretPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+    guessed = Array.from(secretPhrase).map(ch => ch.match(/[A-Z]/) ? '_' : ch);
+    guessedLetters.clear();
+    guessedWords.clear();
+    attempts = 6;
+    createLetterKeyboard();
+    updateDisplay();
+    guessInput.disabled = false;
+    guessButton.disabled = false;
+    playAgainBtn.disabled = true;
+    hideMessage();
+    guessInput.focus();
+}
+
+function updateDisplay() {
+    phraseEl.textContent = guessed.join(' ');
+    
+    // Dynamically adjust font size based on word length to ensure single line display
+    const wordLength = secretPhrase.length;
+    let fontSize, letterSpacing;
+    
+    if (wordLength <= 8) {
+        fontSize = '80px';
+        letterSpacing = '15px';
+    } else if (wordLength <= 10) {
+        fontSize = '70px';
+        letterSpacing = '12px';
+    } else if (wordLength <= 12) {
+        fontSize = '60px';
+        letterSpacing = '10px';
+    } else if (wordLength <= 14) {
+        fontSize = '50px';
+        letterSpacing = '8px';
+    } else {
+        fontSize = '40px';
+        letterSpacing = '6px';
+    }
+    
+    phraseEl.style.fontSize = fontSize;
+    phraseEl.style.letterSpacing = letterSpacing;
+    
+    attemptsEl.textContent = `Remaining attempts: ${attempts}`;
+}
+
+function makeGuess() {
+    const guess = guessInput.value.trim().toUpperCase();
+    guessInput.value = '';
+
+    // Validate input - must be letters only
+    if (!/^[A-Z]+$/.test(guess)) {
+        playSound('invalid');
+        showMessage('Please enter only letters (A-Z).', 'error');
+        return;
+    }
+
+    // Check if it's a single letter or a word
+    if (guess.length === 1) {
+        // Use the guessLetter function for single letters
+        guessLetter(guess);
+        return;
+    } else {
+        // Word guess
+        if (guessedWords.has(guess)) {
+            playSound('invalid');
+            showMessage("You've already guessed that word.", 'error');
+            return;
+        }
+
+        guessedWords.add(guess);
+
+        if (guess === secretPhrase) {
+            // Correct word guess - reveal the entire word
+            playSound('correct');
+            for (let i = 0; i < secretPhrase.length; i++) {
+                guessed[i] = secretPhrase[i];
+            }
+            showMessage(`Excellent! You guessed the word!`, 'success', 2000);
+        } else {
+            attempts--;
+            playSound('incorrect');
+            showMessage(`Sorry, '${guess}' is not the correct word.`, 'error', 2000);
+        }
+    }
+
+    updateDisplay();
+    checkGameOver();
+    
+    // Keep focus on input for next guess (unless game is over)
+    if (!guessInput.disabled) {
+        guessInput.focus();
+    }
+}
+
+function checkGameOver() {
+    if (!guessed.includes('_')) {
+        endGame(true);
+    } else if (attempts <= 0) {
+        endGame(false);
+    }
+}
+
+function endGame(win) {
+    // Disable inputs immediately
+    guessInput.disabled = true;
+    guessButton.disabled = true;
+    playAgainBtn.disabled = false;
+    
+    // Disable all letter buttons
+    const letterButtons = letterKeyboard.querySelectorAll('.letter-btn');
+    letterButtons.forEach(btn => btn.disabled = true);
+
+    if (win) {
+        // play win sound then show message
+        playSound('win');
+        setTimeout(() => {
+            showMessage(`🎉 You Won!\nYou guessed the phrase: '${secretPhrase}'`, 'success');
+        }, 120);
+    } else {
+        playSound('lose');
+        setTimeout(() => {
+            showMessage(`😢 Game Over\nThe phrase was: '${secretPhrase}'`, 'gameover');
+        }, 120);
+    }
+}
+
+// Event listeners
+guessButton.addEventListener('click', makeGuess);
+guessInput.addEventListener('keyup', e => {
+    if (e.key === 'Enter') makeGuess();
+});
+playAgainBtn.addEventListener('click', () => {
+    newGame();
+});
+
+soundToggleBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    soundToggleBtn.textContent = soundEnabled ? '🔊 Sound: On' : '🔈 Sound: Off';
+    soundToggleBtn.setAttribute('aria-pressed', String(!soundEnabled));
+});
+
+// Start first game
+newGame();
+
+</script>
+
+</body>
+</html>
