@@ -366,6 +366,7 @@ let guessedLetters = new Set();
 let guessedWords = new Set();
 let attempts = 6;
 let soundEnabled = true;
+let usedWords = new Set(); // Track used words
 
 const phraseEl = document.getElementById('phrase');
 const guessInput = document.getElementById('guessInput');
@@ -500,7 +501,22 @@ function guessLetter(letter) {
 function newGame() {
     // Refresh word list in case it was updated
     const currentPhrases = getActiveWordList();
-    secretPhrase = currentPhrases[Math.floor(Math.random() * currentPhrases.length)];
+    
+    // Get available words (not yet used)
+    const availableWords = currentPhrases.filter(word => !usedWords.has(word));
+    
+    // If no words available, reset the used words set (start over)
+    if (availableWords.length === 0) {
+        usedWords.clear();
+        secretPhrase = currentPhrases[Math.floor(Math.random() * currentPhrases.length)];
+    } else {
+        // Select from unused words
+        secretPhrase = availableWords[Math.floor(Math.random() * availableWords.length)];
+    }
+    
+    // Mark this word as used
+    usedWords.add(secretPhrase);
+    
     guessed = Array.from(secretPhrase).map(ch => ch.match(/[A-Z]/) ? '_' : ch);
     guessedLetters.clear();
     guessedWords.clear();
