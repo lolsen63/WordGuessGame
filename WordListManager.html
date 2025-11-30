@@ -243,6 +243,10 @@
             <label for="newListWords">Words (one per line or comma-separated):</label>
             <textarea id="newListWords" placeholder="Enter words here...&#10;ALGORITHM&#10;MODULE&#10;MATRIX&#10;or: ALGORITHM, MODULE, MATRIX"></textarea>
         </div>
+        <div class="input-group">
+            <label for="newListAttempts">Number of Attempts:</label>
+            <input type="number" id="newListAttempts" min="1" max="20" value="6" placeholder="6">
+        </div>
         <button class="btn primary" onclick="createNewList()">Create List</button>
     </div>
 
@@ -278,6 +282,10 @@
             <label for="editListWords">Words (one per line):</label>
             <textarea id="editListWords"></textarea>
         </div>
+        <div class="input-group">
+            <label for="editListAttempts">Number of Attempts:</label>
+            <input type="number" id="editListAttempts" min="1" max="20" value="6" placeholder="6">
+        </div>
         <div style="text-align: center; margin-top: 20px;">
             <button class="btn primary" onclick="saveEditedList()">Save Changes</button>
             <button class="btn" onclick="closeEditModal()">Cancel</button>
@@ -298,11 +306,13 @@ const defaultLists = {
     },
     'animals': {
         name: 'Animals',
-        words: ['ELEPHANT','GIRAFFE','RHINOCEROS','HIPPOPOTAMUS','CHIMPANZEE','KANGAROO','PENGUIN','DOLPHIN','BUTTERFLY','DRAGONFLY','CROCODILE','CHAMELEON','OCTOPUS','JELLYFISH','SEAHORSE','FLAMINGO','PEACOCK','HUMMINGBIRD','RATTLESNAKE','SALAMANDER']
+        words: ['ELEPHANT','GIRAFFE','RHINOCEROS','HIPPOPOTAMUS','CHIMPANZEE','KANGAROO','PENGUIN','DOLPHIN','BUTTERFLY','DRAGONFLY','CROCODILE','CHAMELEON','OCTOPUS','JELLYFISH','SEAHORSE','FLAMINGO','PEACOCK','HUMMINGBIRD','RATTLESNAKE','SALAMANDER'],
+        attempts: 8
     },
     'countries': {
         name: 'Countries',
-        words: ['AFGHANISTAN','BANGLADESH','CAMBODIA','DENMARK','ETHIOPIA','GUATEMALA','HONDURAS','INDONESIA','KAZAKHSTAN','LUXEMBOURG','MADAGASCAR','NICARAGUA','PHILIPPINES','SWITZERLAND','UZBEKISTAN','VENEZUELA','ZIMBABWE']
+        words: ['AFGHANISTAN','BANGLADESH','CAMBODIA','DENMARK','ETHIOPIA','GUATEMALA','HONDURAS','INDONESIA','KAZAKHSTAN','LUXEMBOURG','MADAGASCAR','NICARAGUA','PHILIPPINES','SWITZERLAND','UZBEKISTAN','VENEZUELA','ZIMBABWE'],
+        attempts: 7
     }
 };
 
@@ -311,6 +321,13 @@ function loadWordLists() {
     const saved = localStorage.getItem('wordGuessLists');
     if (saved) {
         wordLists = JSON.parse(saved);
+        // Ensure backward compatibility - add attempts to existing lists without it
+        for (const [id, list] of Object.entries(wordLists)) {
+            if (!list.attempts) {
+                list.attempts = 6; // Default attempts
+            }
+        }
+        saveWordLists(); // Save the updated lists
     } else {
         // Initialize with default lists
         wordLists = { ...defaultLists };
@@ -358,7 +375,7 @@ function displayWordLists() {
                     <button class="btn delete" onclick="deleteList('${id}')">Delete</button>
                 </div>
             </div>
-            <div class="word-count">${list.words.length} words</div>
+            <div class="word-count">${list.words.length} words • ${list.attempts || 6} attempts</div>
             <div class="word-preview">${preview}${moreText}</div>
         `;
         
@@ -422,6 +439,7 @@ function editList(id) {
     
     document.getElementById('editListName').value = list.name;
     document.getElementById('editListWords').value = list.words.join('\n');
+    document.getElementById('editListAttempts').value = list.attempts || 6;
     document.getElementById('editModal').style.display = 'block';
 }
 
@@ -429,9 +447,15 @@ function editList(id) {
 function saveEditedList() {
     const name = document.getElementById('editListName').value.trim();
     const wordsText = document.getElementById('editListWords').value.trim();
+    const attempts = parseInt(document.getElementById('editListAttempts').value) || 6;
     
     if (!name || !wordsText) {
         alert('Please enter both a list name and words.');
+        return;
+    }
+    
+    if (attempts < 1 || attempts > 20) {
+        alert('Number of attempts must be between 1 and 20.');
         return;
     }
     
@@ -449,14 +473,15 @@ function saveEditedList() {
     
     wordLists[editingListId] = {
         name: name,
-        words: uniqueWords
+        words: uniqueWords,
+        attempts: attempts
     };
     
     saveWordLists();
     displayWordLists();
     closeEditModal();
     
-    alert(`Updated "${name}" with ${uniqueWords.length} words.`);
+    alert(`Updated "${name}" with ${uniqueWords.length} words and ${attempts} attempts.`);
 }
 
 // Close edit modal

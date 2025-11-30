@@ -323,7 +323,8 @@ function getWordLists() {
     return {
         'technical': {
             name: 'Technical Terms',
-            words: ['ALGORITHM','MODULE','CALIPER','MATRIX','KINETIC','FORMULA','GRAVITY','BALANCE','NUCLEAR','SOFTWARE','ROTATION','CONTRAST','EXTRUSION','PARAMETER','HISTOGRAM','RENDERING','DIMENSION','COMPONENT','TRUNCATED','PROTOTYPE','TOLERANCE','ITERATION','COMPOSITE','STRUCTURAL','REVOLUTION','ENCRYPTION','INNOVATION','SIMULATION','COUNTERSINK','ABSTRACTION','SUSTAINABLE','PERSPECTIVE','CIRCUMSCRIBE','ASYMMETRICAL']
+            words: ['ALGORITHM','MODULE','CALIPER','MATRIX','KINETIC','FORMULA','GRAVITY','BALANCE','NUCLEAR','SOFTWARE','ROTATION','CONTRAST','EXTRUSION','PARAMETER','HISTOGRAM','RENDERING','DIMENSION','COMPONENT','TRUNCATED','PROTOTYPE','TOLERANCE','ITERATION','COMPOSITE','STRUCTURAL','REVOLUTION','ENCRYPTION','INNOVATION','SIMULATION','COUNTERSINK','ABSTRACTION','SUSTAINABLE','PERSPECTIVE','CIRCUMSCRIBE','ASYMMETRICAL'],
+            attempts: 6
         }
     };
 }
@@ -346,6 +347,15 @@ function getActiveListName() {
         return wordLists[activeListId].name;
     }
     return 'Technical Terms';
+}
+
+function getActiveListAttempts() {
+    const activeListId = localStorage.getItem('activeWordList') || 'technical';
+    const wordLists = getWordLists();
+    if (wordLists[activeListId] && wordLists[activeListId].attempts) {
+        return wordLists[activeListId].attempts;
+    }
+    return 6; // Default attempts
 }
 
 const phrases = getActiveWordList();
@@ -494,7 +504,7 @@ function newGame() {
     guessed = Array.from(secretPhrase).map(ch => ch.match(/[A-Z]/) ? '_' : ch);
     guessedLetters.clear();
     guessedWords.clear();
-    attempts = 6;
+    attempts = getActiveListAttempts();
     createLetterKeyboard();
     updateDisplay();
     updateListInfo();
@@ -635,7 +645,8 @@ soundToggleBtn.addEventListener('click', () => {
 function updateListInfo() {
     const listName = getActiveListName();
     const wordCount = getActiveWordList().length;
-    document.getElementById('listInfo').textContent = `Playing: ${listName} (${wordCount} words)`;
+    const attemptCount = getActiveListAttempts();
+    document.getElementById('listInfo').textContent = `Playing: ${listName} (${wordCount} words, ${attemptCount} attempts)`;
 }
 
 // Check for list updates when page gains focus (returning from manager)
